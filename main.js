@@ -1,21 +1,26 @@
 "use strict";
-let panel = document.querySelector("canvas");
-const numWB = 3;
-const numHB = 3;
-let inCorrectPosition = 0;
-let points = [];
-let images = [];
-let eachPeaceWidth = 0;
-let eachPeaceHeight = 0;
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var Move;
+(function (Move) {
+    Move[Move["UP"] = 0] = "UP";
+    Move[Move["DOWN"] = 1] = "DOWN";
+    Move[Move["LEFT"] = 2] = "LEFT";
+    Move[Move["RIGHT"] = 3] = "RIGHT";
+    Move[Move["NONE"] = 4] = "NONE";
+})(Move || (Move = {}));
 function shuffle(array) {
-    // debugger;
     let currentIndex = array.length, randomIndex;
-    // While there remain elements to shuffle.
     while (currentIndex != 0) {
-        // Pick a remaining element.
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
-        // And swap it with the current element.
         [array[currentIndex], array[randomIndex]] = [
             array[randomIndex],
             array[currentIndex],
@@ -23,18 +28,14 @@ function shuffle(array) {
     }
     return array;
 }
-function multihuffle(...arr) {
-    // debugger;
+function multiShuffle(...arr) {
     if (arr.length) {
         let array = arr[0];
         const arrLength = arr.length;
         let currentIndex = array.length, randomIndex;
-        // While there remain elements to shuffle.
         while (currentIndex != 0) {
-            // Pick a remaining element.
             randomIndex = Math.floor(Math.random() * currentIndex);
             currentIndex--;
-            // And swap it with the current element.
             for (let index = 0; index < arrLength; index++) {
                 [arr[index][currentIndex], arr[index][randomIndex]] = [
                     arr[index][randomIndex],
@@ -52,7 +53,6 @@ function myShuffle(arr) {
     const length = arr.length;
     let newArray = [];
     for (let index = 0; index < length; index++) {
-        // const element = arr[index];
         const elNum = random(length - index);
         const element = arr[elNum];
         arr.splice(elNum, 1);
@@ -60,52 +60,21 @@ function myShuffle(arr) {
     }
     return newArray;
 }
-let positionMap = {};
-let currentRect = {
-    id: -1,
-    sh: -1,
-    sw: -1,
-    sx: -1,
-    sy: -1,
-    currId: -1,
-    index: -1,
-    isReact: false,
-    mainId: -1,
-    key: "",
-};
-let a = [1, 2, 3, 5, 5, 6, 7, 8, 9, 0];
-let aa = ["11", "23", "34", "55", "56", "67", "78", "89", "90", "1"];
-console.log(multihuffle(a, aa));
-console.log(a);
-console.log(aa);
 function random(num) {
     return Math.floor(Math.random() * num);
 }
-var Move;
-(function (Move) {
-    Move[Move["UP"] = 0] = "UP";
-    Move[Move["DOWN"] = 1] = "DOWN";
-    Move[Move["LEFT"] = 2] = "LEFT";
-    Move[Move["RIGHT"] = 3] = "RIGHT";
-    Move[Move["NONE"] = 4] = "NONE";
-})(Move || (Move = {}));
-function moveDirection(x, y) {
-    // const pointRect = points[currentRect.currId];
-    // console.log(pointRect, points, currentRect, x, y);
-    const xRect = currentRect.sx;
-    const yRect = currentRect.sy;
+function moveDirection(x, y, xRect, yRect) {
     const xCheck = x == xRect;
     const yCheck = y == yRect;
-    // console.log(xCheck, yCheck);
-    if (!yCheck && !xCheck) {
+    if ((!yCheck && !xCheck) || (xCheck && yCheck)) {
         return Move.NONE;
     }
     else {
         if (xCheck) {
-            if (y + eachPeaceHeight == yRect) {
+            if (y + 1 == yRect) {
                 return Move.DOWN;
             }
-            else if (y - eachPeaceHeight == yRect) {
+            else if (y - 1 == yRect) {
                 return Move.UP;
             }
             else {
@@ -113,10 +82,10 @@ function moveDirection(x, y) {
             }
         }
         else {
-            if (x + eachPeaceWidth == xRect) {
+            if (x + 1 == xRect) {
                 return Move.RIGHT;
             }
-            else if (x - eachPeaceWidth == xRect) {
+            else if (x - 1 == xRect) {
                 return Move.LEFT;
             }
             else {
@@ -125,210 +94,148 @@ function moveDirection(x, y) {
         }
     }
 }
-function checkWin() {
-    let allpass = true;
-    Object.keys(positionMap).forEach((v) => {
-        allpass = allpass && positionMap[v].currId == positionMap[v].mainId;
+window.onload = function () {
+    var _a;
+    let panel = document.querySelector("canvas");
+    const imageElement = document.querySelector("#uploadedImage");
+    var ctx = panel.getContext("2d");
+    const path = "./1.png";
+    let image = new Image();
+    image.src = path;
+    const numWB = 4;
+    const numHB = 4;
+    let isDone = false;
+    let inCorrectPosition = 0;
+    let points = [];
+    let mainPoints = [];
+    let images = [];
+    let eachPeaceWidth = 0;
+    let eachPeaceHeight = 0;
+    let positionMap = {};
+    function checkWin() {
+        let allpass = true;
+        Object.keys(positionMap).forEach((v, index) => {
+            allpass = allpass && positionMap[v].positionKey == images[index].key;
+        });
+        isDone = allpass;
+        if (allpass) {
+            alert("you are win");
+            ctx === null || ctx === void 0 ? void 0 : ctx.drawImage(image, 0, 0);
+        }
+    }
+    let currentRect;
+    (_a = document.querySelector("input#file")) === null || _a === void 0 ? void 0 : _a.addEventListener("input", function ($event) {
+        if ($event.target) {
+            const event = $event.target;
+            if (event.files) {
+                const file = event.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (e.target) {
+                        const imageBlob = new Blob([e.target.result], {
+                            type: file.type,
+                        });
+                        const imageURL = URL.createObjectURL(imageBlob);
+                        image.src = imageURL;
+                        imageElement.src = imageURL;
+                    }
+                };
+                if (file) {
+                    reader.readAsArrayBuffer(file);
+                }
+            }
+        }
     });
-    console.log(allpass);
-}
-panel.addEventListener("click", function (e) {
-    console.log("***", Math.floor(e.clientX / eachPeaceWidth), Math.floor(e.clientY / eachPeaceHeight));
-    const endX = Math.ceil(e.clientX / eachPeaceWidth) * eachPeaceWidth;
-    const startX = endX - eachPeaceWidth;
-    const endY = Math.ceil(e.clientY / eachPeaceHeight) * eachPeaceHeight;
-    const startY = endY - eachPeaceHeight;
-    const element = positionMap[startX + "-" + endX + "-" + startY + "-" + endY];
-    console.log(element
-    // startX + "-" + endX + "-" + startY + "-" + endY,
-    // positionMap
-    );
-    if (!element.isReact) {
-        const direction = moveDirection(startX, startY);
-        // console.log(MO)
-        console.log(direction, Move.NONE);
+    panel.addEventListener("click", function (e) {
+        if (isDone) {
+            return;
+        }
+        const x = Math.floor(e.offsetX / eachPeaceWidth);
+        const y = Math.floor(e.offsetY / eachPeaceHeight);
+        let rect = Object.assign({}, positionMap[currentRect]);
+        let rectPoint = points[rect.index];
+        const xRect = Math.floor(rectPoint.sx / eachPeaceWidth);
+        const yRect = Math.floor(rectPoint.sy / eachPeaceHeight);
+        const direction = moveDirection(x, y, xRect, yRect);
         if (direction == Move.NONE) {
             return;
         }
-        ctx === null || ctx === void 0 ? void 0 : ctx.clearRect(startX, startY, eachPeaceWidth, eachPeaceHeight);
-        if (Move.UP == direction) {
-            ctx === null || ctx === void 0 ? void 0 : ctx.drawImage(images[element.currId], startX, startY - eachPeaceHeight);
-            // positionMap[currentRect.key].
-            currentRect.sy += eachPeaceHeight;
-        }
-        else if (Move.DOWN == direction) {
-            ctx === null || ctx === void 0 ? void 0 : ctx.drawImage(images[element.currId], startX, startY + eachPeaceHeight);
-            currentRect.sy -= eachPeaceHeight;
-        }
-        else if (Move.RIGHT == direction) {
-            ctx === null || ctx === void 0 ? void 0 : ctx.drawImage(images[element.currId], startX + eachPeaceWidth, startY);
-            currentRect.sx -= eachPeaceWidth;
-        }
-        else if (Move.LEFT == direction) {
-            ctx === null || ctx === void 0 ? void 0 : ctx.drawImage(images[element.currId], startX - eachPeaceWidth, startY);
-            currentRect.sx += eachPeaceWidth;
-        }
-        positionMap[currentRect.key] = Object.assign(Object.assign({}, currentRect), { isReact: false, currId: element.currId, index: element.index });
-        currentRect.key = element.key;
-        positionMap[element.key] = Object.assign(Object.assign({}, element), { isReact: true, currId: currentRect.currId, index: currentRect.index });
-        // console.log(positionMap);
-        ctx === null || ctx === void 0 ? void 0 : ctx.fillRect(currentRect.sx, currentRect.sy, eachPeaceWidth, eachPeaceHeight);
+        const element = Object.assign({}, positionMap[x + "-" + y]);
+        const pointEl = points[element.index];
+        ctx === null || ctx === void 0 ? void 0 : ctx.clearRect(pointEl.sx, pointEl.sy, eachPeaceWidth, eachPeaceHeight);
+        ctx === null || ctx === void 0 ? void 0 : ctx.clearRect(rectPoint.sx, rectPoint.sy, eachPeaceWidth, eachPeaceHeight);
+        ctx === null || ctx === void 0 ? void 0 : ctx.drawImage(images[element.index].image, rectPoint.sx, rectPoint.sy);
+        ctx === null || ctx === void 0 ? void 0 : ctx.fillRect(pointEl.sx, pointEl.sy, eachPeaceWidth, eachPeaceHeight);
+        [images[element.index], images[rect.index]] = [
+            images[rect.index],
+            images[element.index],
+        ];
+        currentRect = x + "-" + y;
         checkWin();
-    }
-    else {
-    }
-    // images.forEach((value, index) => {
-    //   ctx?.drawImage(value, points[index].sx, points[index].sy);
-    //   console.log(value.width, value.height);
-    // });
-});
-console.log(panel);
-var ctx = panel.getContext("2d");
-const image = new Image();
-image.src = "./test5.png";
-image.onload = () => {
-    console.log(image.width, image.height);
-    let withB = image.width / numWB;
-    let heightB = image.height / numHB;
-    eachPeaceHeight = heightB;
-    eachPeaceWidth = withB;
-    // let indexKeeper: number[] = [];
-    for (let index = 0; index < numWB; index++) {
-        for (let indexH = 0; indexH < numHB; indexH++) {
-            // indexKeeper.push();
-            points.push({
-                sx: withB * index,
-                sy: heightB * indexH,
-                sw: withB,
-                sh: heightB,
-                id: index * numWB + indexH,
-                // index:index * numWB + indexH
-            });
-        }
-    }
-    // console.log(points, indexKeeper);
-    panel.setAttribute("height", image.height + "");
-    panel.setAttribute("width", image.width + "");
-    //   panel.style.width = image.width + "px";
-    //   panel.style.height =  + "px";
-    //   ctx?.drawImage(image, 0, 0);
-    Promise.all([
-        // Cut out two sprites from the sprite sheet
-        ...points.map((v) => {
-            return createImageBitmap(image, v.sx, v.sy, v.sw, v.sh);
-        }),
-        // createImageBitmap(image, 32, 0, 32, 32),
-    ]).then((sprites) => {
-        images = sprites;
-        const mainPoints = [...points];
-        let keepImage = random(numHB * numWB);
-        multihuffle(points, sprites);
-        console.log(points);
-        const shuffleValueLength = sprites.length;
-        for (let index = 0; index < shuffleValueLength; index++) {
-            const element = sprites[index];
-            const pointC = mainPoints[index];
-            const pointM = points[index];
-            const isReact = keepImage == index;
-            const keyObj = pointC.sx +
-                "-" +
-                (pointC.sx + pointC.sw) +
-                "-" +
-                pointC.sy +
-                "-" +
-                (pointC.sy + pointC.sh);
-            positionMap[keyObj] = {
-                mainId: pointM.id,
-                currId: pointC.id,
-                index,
-                isReact,
-                key: keyObj,
-            };
-            if (pointM.id == pointC.id) {
-                inCorrectPosition++;
-            }
-            if (isReact) {
-                currentRect = Object.assign(Object.assign({}, mainPoints[index]), { mainId: pointM.id, currId: pointC.id, index,
-                    isReact, key: keyObj });
-                // ctx?.drawImage(element, mainPoints[index].sx, mainPoints[index].sy);
-                ctx === null || ctx === void 0 ? void 0 : ctx.fillRect(mainPoints[index].sx, mainPoints[index].sy, mainPoints[index].sw, mainPoints[index].sh);
-            }
-            else {
-                ctx === null || ctx === void 0 ? void 0 : ctx.drawImage(element, mainPoints[index].sx, mainPoints[index].sy);
-            }
-        }
-        // console.log(positionMap);
-        // setTimeout(() => {
-        //   Object.keys(positionMap).forEach((v) => {
-        //     const mainId = positionMap[v].mainId;
-        //     ctx?.drawImage(images[mainId], points[mainId].sx, points[mainId].sy);
-        //   });
-        // }, 1000);
-        // sprites.forEach((value, index) => {
-        //   ctx?.drawImage(value, points[index].sx, points[index].sy);
-        //   console.log(value.width,value.height)
-        // });
-        // Draw each sprite onto the canvas
-        // ctx?.drawImage(image,0,0)
-        // points.forEach((v) => {});
-        // ctx?.drawImage(
-        //   sprites[0],
-        //   0,
-        //   0,
-        //   sprites[0].width,
-        //   sprites[0].height,
-        //   points[0].sx,
-        //   points[0].sy,
-        //   points[0].sw,
-        //   points[0].sh
-        // );
-        // ctx?.drawImage(
-        //   sprites[1],
-        //   0,
-        //   0,
-        //   sprites[0].width,
-        //   sprites[0].height,
-        //   points[1].sx,
-        //   points[1].sy,
-        //   points[1].sw,
-        //   points[1].sh
-        // );
-        // ctx?.drawImage(
-        //   sprites[2],
-        //   0,
-        //   0,
-        //   sprites[0].width,
-        //   sprites[0].height,
-        //   points[2].sx,
-        //   points[2].sy,
-        //   points[2].sw,
-        //   points[2].sh
-        // );
-        // ctx?.drawImage(
-        //   sprites[3],
-        //   0,
-        //   0,
-        //   sprites[0].width,
-        //   sprites[0].height,
-        //   points[3].sx,
-        //   points[3].sy,
-        //   points[3].sw,
-        //   points[3].sh
-        // );
-        // ctx?.drawImage(sprites[0], points[0].sx, points[0].sy);
-        // ctx?.drawImage(sprites[1], points[2].sx, points[2].sy);
-        // ctx?.drawImage(sprites[2], points[1].sx, points[1].sy);
-        // ctx?.drawImage(sprites[3], points[3].sx, points[3].sy);
     });
+    image.onload = () => {
+        isDone = false;
+        inCorrectPosition = 0;
+        points = [];
+        mainPoints = [];
+        images = [];
+        eachPeaceWidth = 0;
+        eachPeaceHeight = 0;
+        positionMap = {};
+        let withB = image.width / numWB;
+        let heightB = image.height / numHB;
+        eachPeaceHeight = heightB;
+        eachPeaceWidth = withB;
+        for (let index = 0; index < numWB; index++) {
+            for (let indexH = 0; indexH < numHB; indexH++) {
+                points.push({
+                    sx: withB * index,
+                    sy: heightB * indexH,
+                    sw: withB,
+                    sh: heightB,
+                    id: index * numWB + indexH,
+                    x: index,
+                    y: indexH,
+                    key: index + "-" + indexH,
+                });
+            }
+        }
+        panel.setAttribute("height", image.height + "");
+        panel.setAttribute("width", image.width + "");
+        Promise.all([
+            ...points.map((v) => __awaiter(this, void 0, void 0, function* () {
+                return {
+                    key: v.key,
+                    v: v,
+                    useIn: "",
+                    image: yield createImageBitmap(image, v.sx, v.sy, v.sw, v.sh),
+                };
+            })),
+        ]).then((sprites) => {
+            let keepImage = random(numHB * numWB);
+            shuffle(points);
+            images = sprites;
+            const shuffleValueLength = sprites.length;
+            for (let index = 0; index < shuffleValueLength; index++) {
+                const element = sprites[index];
+                const pointM = points[index];
+                const isRect = keepImage == index;
+                const keyObj = pointM.key;
+                positionMap[keyObj] = {
+                    image: element.image,
+                    imageKey: element.key,
+                    positionKey: pointM.key,
+                    index,
+                    key: keyObj,
+                };
+                if (isRect) {
+                    currentRect = keyObj;
+                    ctx === null || ctx === void 0 ? void 0 : ctx.fillRect(points[index].sx, points[index].sy, eachPeaceWidth, eachPeaceHeight);
+                }
+                else {
+                    ctx === null || ctx === void 0 ? void 0 : ctx.drawImage(element.image, points[index].sx, points[index].sy);
+                }
+            }
+        });
+    };
 };
-// fetch("./s.png")
-//   .then((res) => {
-//     console.log(res.body);
-//     // ctx.drawImage(res.body,10,10)
-//     return res.body;
-//     //   var b = new Blob(res, { type: "image/png" });
-//   })
-//   .then((res) => {
-//     console.log(res);
-//   });
-// ctx.drawImage("./s.png", 10, 10);

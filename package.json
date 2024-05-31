@@ -1,10 +1,12 @@
 {
   "scripts": {
-    "dev":"nodemon --exec \"npm run start\"",
-    "start": "tsc"
+    "dev": "nodemon --exec \"npm run start\"",
+    "start": "tsc --watch",
+    "build": "rollup main.ts --file bundle.js --format iife"
   },
   "devDependencies": {
     "nodemon": "^2.0.22",
+    "rollup": "^4.18.0",
     "typescript": "^5.0.2"
   }
 }
