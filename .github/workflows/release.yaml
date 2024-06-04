@@ -15,8 +15,8 @@ jobs:
                 git config --global user.name "GitHub Actions"
                 git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-            - name: Merge to Develop
+            - name: Merge to gh
               run: |
-                git checkout develop
+                git checkout gh
                 git merge main
-                git push origin develop
+                git push origin gh
