@@ -17,6 +17,6 @@ jobs:
 
             - name: Merge to gh
               run: |
-                git checkout gh
+                git checkout --track -q gh
                 git merge main
                 git push origin gh
