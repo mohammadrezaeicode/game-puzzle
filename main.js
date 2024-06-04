@@ -96,14 +96,40 @@ function moveDirection(x, y, xRect, yRect) {
 }
 window.onload = function () {
     var _a;
+    let numWB = 4;
+    let numHB = 4;
     let panel = document.querySelector("canvas");
+    let xAxisInput = document.querySelector("#x");
+    let yAxisInput = document.querySelector("#y");
+    xAxisInput.value = numWB + "";
+    yAxisInput.value = numHB + "";
+    xAxisInput.addEventListener("input", function (event) {
+        let xAxisValue = +xAxisInput.value;
+        if (!isNaN(xAxisValue)) {
+            xAxisValue = Math.floor(xAxisValue);
+            if (+xAxisInput.value != xAxisValue) {
+                xAxisInput.value = xAxisValue + "";
+            }
+            numWB = xAxisValue;
+            reload();
+        }
+    });
+    yAxisInput.addEventListener("input", function (event) {
+        let yAxisValue = +yAxisInput.value;
+        if (!isNaN(yAxisValue)) {
+            yAxisValue = Math.floor(yAxisValue);
+            if (+yAxisInput.value != yAxisValue) {
+                yAxisInput.value = yAxisValue + "";
+            }
+            numHB = yAxisValue;
+            reload();
+        }
+    });
     const imageElement = document.querySelector("#uploadedImage");
     var ctx = panel.getContext("2d");
     const path = "./1.png";
     let image = new Image();
     image.src = path;
-    const numWB = 4;
-    const numHB = 4;
     let isDone = false;
     let inCorrectPosition = 0;
     let points = [];
@@ -173,7 +199,7 @@ window.onload = function () {
         currentRect = x + "-" + y;
         checkWin();
     });
-    image.onload = () => {
+    function reload() {
         isDone = false;
         inCorrectPosition = 0;
         points = [];
@@ -237,5 +263,8 @@ window.onload = function () {
                 }
             }
         });
+    }
+    image.onload = () => {
+        reload();
     };
 };

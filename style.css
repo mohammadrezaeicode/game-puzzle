@@ -59,3 +59,16 @@ body {
 
   filter: blur(2px);
 }
+.dimension{
+  display: flex;
+  gap: 5px;
+}
+.dimension input{
+      border: none;
+    height: 29px;
+    padding: 7px;
+}
+.input-container{
+  display: flex;
+  flex-direction: column;
+}
