@@ -131,9 +131,7 @@ window.onload = function () {
     let image = new Image();
     image.src = path;
     let isDone = false;
-    let inCorrectPosition = 0;
     let points = [];
-    let mainPoints = [];
     let images = [];
     let eachPeaceWidth = 0;
     let eachPeaceHeight = 0;
@@ -173,6 +171,7 @@ window.onload = function () {
         }
     });
     panel.addEventListener("click", function (e) {
+        debugger;
         if (isDone) {
             return;
         }
@@ -180,8 +179,8 @@ window.onload = function () {
         const y = Math.floor(e.offsetY / eachPeaceHeight);
         let rect = Object.assign({}, positionMap[currentRect]);
         let rectPoint = points[rect.index];
-        const xRect = Math.floor(rectPoint.sx / eachPeaceWidth);
-        const yRect = Math.floor(rectPoint.sy / eachPeaceHeight);
+        const xRect = rectPoint.x;
+        const yRect = rectPoint.y;
         const direction = moveDirection(x, y, xRect, yRect);
         if (direction == Move.NONE) {
             return;
@@ -201,9 +200,7 @@ window.onload = function () {
     });
     function reload() {
         isDone = false;
-        inCorrectPosition = 0;
         points = [];
-        mainPoints = [];
         images = [];
         eachPeaceWidth = 0;
         eachPeaceHeight = 0;
