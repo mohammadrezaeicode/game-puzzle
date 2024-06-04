@@ -1,0 +1,22 @@
+name: Release gh branch
+on:
+    push:
+        branches: 
+            - main
+jobs:
+    merge:
+        name: Merge branch
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout to code
+              uses: actions/checkout@v4
+            - name: Configure Git
+              run: |
+                git config --global user.name "GitHub Actions"
+                git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+            - name: Merge to Develop
+              run: |
+                git checkout develop
+                git merge main
+                git push origin develop
